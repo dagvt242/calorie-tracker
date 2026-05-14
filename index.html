@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CalorieTracker</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <h1>CalorieTracker</h1>
+        <span>Рахуй раціон</span>
+      </div>
+
+      <nav>
+        <a class="nav-item" data-view="diary">
+          <span class="nav-icon">📒</span> Щоденник
+        </a>
+        <a class="nav-item" data-view="foods">
+          <span class="nav-icon">🥦</span> База продуктів
+        </a>
+        <a class="nav-item" data-view="stats">
+          <span class="nav-icon">📈</span> Статистика
+        </a>
+        <a class="nav-item" data-view="settings">
+          <span class="nav-icon">⚙️</span> Налаштування
+        </a>
+      </nav>
+    </aside>
+
+    <!-- HEADER -->
+    <header class="main-header">
+      <h2>Щоденник харчування</h2>
+      <div class="date-nav">
+        <button class="date-nav-btn" id="prev-day">‹</button>
+        <span class="date-display" id="current-date-display"></span>
+        <button class="date-nav-btn" id="next-day">›</button>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- DIARY VIEW -->
+      <section class="view" id="view-diary">
+        <!-- Macro Cards -->
+        <div class="grid-4" style="margin-bottom:20px">
+          <div class="macro-card cal" id="macro-cal">
+            <div class="macro-value">0 ккал</div>
+            <div class="macro-label">Калорії</div>
+            <div class="macro-goal">з 2000 ккал · 0%</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          </div>
+          <div class="macro-card protein" id="macro-protein">
+            <div class="macro-value">0г</div>
+            <div class="macro-label">Білки</div>
+            <div class="macro-goal">з 150г · 0%</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          </div>
+          <div class="macro-card fat" id="macro-fat">
+            <div class="macro-value">0г</div>
+            <div class="macro-label">Жири</div>
+            <div class="macro-goal">з 65г · 0%</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          </div>
+          <div class="macro-card carbs" id="macro-carbs">
+            <div class="macro-value">0г</div>
+            <div class="macro-label">Вуглеводи</div>
+            <div class="macro-goal">з 250г · 0%</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <!-- Weekly Chart -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">Калорії за 7 днів</div>
+          <div class="chart-container" id="weekly-chart"></div>
+        </div>
+
+        <!-- Meals -->
+        <div class="card">
+          <div class="card-title">Прийоми їжі</div>
+          <div id="meals-container"></div>
+        </div>
+      </section>
+
+      <!-- FOOD DATABASE VIEW -->
+      <section class="view" id="view-foods">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:0">База продуктів</div>
+            <button class="btn btn-primary" id="add-food-btn">+ Додати продукт</button>
+          </div>
+
+          <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="food-db-search" placeholder="Пошук продукту..." />
+          </div>
+
+          <div id="food-db-list"></div>
+        </div>
+      </section>
+
+      <!-- STATS VIEW -->
+      <section class="view" id="view-stats">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">Середні показники за тиждень</div>
+          <div class="grid-4" style="margin-bottom:12px">
+            <div id="avg-cal">
+              <div class="avg-value" style="font-family:var(--font-mono);font-size:1.4rem;color:var(--accent)">—</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px">Сер. калорії/день</div>
+              <div class="avg-label" style="font-size:0.65rem;color:var(--text-dim)"></div>
+            </div>
+            <div id="avg-protein">
+              <div class="avg-value" style="font-family:var(--font-mono);font-size:1.4rem;color:var(--accent4)">—</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px">Сер. білки/день</div>
+              <div class="avg-label" style="font-size:0.65rem;color:var(--text-dim)"></div>
+            </div>
+            <div id="avg-fat">
+              <div class="avg-value" style="font-family:var(--font-mono);font-size:1.4rem;color:var(--accent2)">—</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px">Сер. жири/день</div>
+              <div class="avg-label" style="font-size:0.65rem;color:var(--text-dim)"></div>
+            </div>
+            <div id="avg-carbs">
+              <div class="avg-value" style="font-family:var(--font-mono);font-size:1.4rem;color:var(--accent3)">—</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px">Сер. вуглеводи/день</div>
+              <div class="avg-label" style="font-size:0.65rem;color:var(--text-dim)"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;font-size:0.8rem;color:var(--text-muted)">
+            <span id="stats-active-days"></span>
+            <span>Найкращий день: <strong id="stats-best-day" style="color:var(--accent)">—</strong></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:0">Деталі по днях</div>
+            <button class="btn btn-secondary" id="export-week-btn" style="font-size:0.8rem;padding:8px 14px">⬇ Експорт CSV</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border)">
+                  <th style="text-align:left;padding:8px 12px;font-size:0.7rem;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:1px">Дата</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:0.7rem;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:1px">День</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:0.7rem;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:1px">Калорії</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:0.7rem;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:1px">Білки</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:0.7rem;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:1px">Жири</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:0.7rem;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:1px">Вуглеводи</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:0.7rem;color:var(--text-muted);font-weight:400;text-transform:uppercase;letter-spacing:1px">% норми</th>
+                </tr>
+              </thead>
+              <tbody id="stats-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS VIEW -->
+      <section class="view" id="view-settings">
+        <div class="card" style="max-width:560px">
+          <div class="card-title">Налаштування</div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">Денні норми</div>
+
+            <div class="form-group">
+              <label class="form-label">Калорії (ккал)</label>
+              <input type="number" class="form-input" id="dailyCalorieGoal" min="500" max="10000" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Білки (г)</label>
+                <input type="number" class="form-input" id="dailyProteinGoal" min="1" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Жири (г)</label>
+                <input type="number" class="form-input" id="dailyFatGoal" min="1" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Вуглеводи (г)</label>
+              <input type="number" class="form-input" id="dailyCarbsGoal" min="1" />
+            </div>
+          </div>
+
+          <div id="settings-msg"></div>
+
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary" id="save-settings-btn">Зберегти</button>
+            <button class="btn btn-danger" id="reset-settings-btn">Скинути</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ADD ENTRY MODAL -->
+  <div class="modal-overlay hidden" id="add-entry-modal">
+    <div class="modal">
+      <div class="modal-title">Додати запис</div>
+
+      <input type="hidden" id="modal-meal-type" />
+
+      <div class="form-group">
+        <label class="form-label">Пошук продукту</label>
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="food-search-input" placeholder="Введіть назву..." />
+        </div>
+        <div id="food-search-results" class="food-search-results"></div>
+        <div id="selected-food-info" style="font-size:0.75rem;color:var(--text-muted);margin-top:6px"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Вага (г)</label>
+        <input type="number" class="form-input" id="entry-grams" placeholder="100" min="1" />
+      </div>
+
+      <div class="alert alert-error" id="entry-error" style="margin-bottom:0"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancel-entry-btn">Скасувати</button>
+        <button class="btn btn-primary" id="confirm-entry-btn">Додати</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD FOOD MODAL -->
+  <div class="modal-overlay hidden" id="add-food-modal">
+    <div class="modal">
+      <div class="modal-title">Новий продукт</div>
+      <form id="add-food-form">
+        <div class="form-group">
+          <label class="form-label">Назва</label>
+          <input type="text" class="form-input" id="food-name" placeholder="Назва продукту" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Калорії на 100г</label>
+          <input type="number" class="form-input" id="food-calories" placeholder="0" min="0" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Білки (г)</label>
+            <input type="number" class="form-input" id="food-protein" placeholder="0" min="0" step="0.1" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Жири (г)</label>
+            <input type="number" class="form-input" id="food-fat" placeholder="0" min="0" step="0.1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Вуглеводи (г)</label>
+          <input type="number" class="form-input" id="food-carbs" placeholder="0" min="0" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Категорія</label>
+          <select class="form-select" id="food-category">
+            <option value="meat">М'ясо</option>
+            <option value="fish">Риба</option>
+            <option value="dairy">Молочне</option>
+            <option value="grains">Зернові</option>
+            <option value="vegetables">Овочі</option>
+            <option value="fruits">Фрукти</option>
+            <option value="legumes">Бобові</option>
+            <option value="fats">Жири</option>
+            <option value="nuts">Горіхи</option>
+            <option value="junk">🍟 Фастфуд</option>
+            <option value="sweets">🍫 Солодощі</option>
+            <option value="drinks">🥤 Напої</option>
+            <option value="other">Інше</option>
+          </select>
+        </div>
+      </form>
+      <div class="alert alert-error" id="add-food-error"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancel-food-btn">Скасувати</button>
+        <button class="btn btn-primary" id="confirm-food-btn">Зберегти</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
