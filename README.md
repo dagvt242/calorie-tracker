@@ -1,168 +1,113 @@
-# 🥗 CalorieTracker
+# CalorieTracker
 
-Застосунок для підрахунку калорій і відстеження харчування з зручним UI та збереженням даних у `localStorage`.
+Застосунок для відстеження харчування та підрахунку калорій. Написаний на чистому JavaScript без залежностей, дані зберігаються у `localStorage`.
 
----
+## Можливості
 
-## Функціональність
+- Щоденник харчування з розбивкою по прийомах їжі
+- Підрахунок калорій, білків, жирів і вуглеводів
+- Прогрес-бари відносно денних норм
+- Тижневий графік калорій
+- База з 70+ продуктів, можливість додавати власні
+- Статистика і середні показники за тиждень
+- Експорт щоденника в CSV
+- Сповіщення при досягненні денної норми
 
-| Функція | Опис |
-|---|---|
-| 📒 Щоденник | Додавання страв по прийомах їжі (сніданок/обід/вечеря/перекус) |
-| 📊 Макронутрієнти | Підрахунок калорій, білків, жирів, вуглеводів з прогрес-барами |
-| 📅 Навігація по датах | Перегляд і редагування записів за будь-який день |
-| 📈 Тижневий графік | Візуалізація споживання калорій за останні 7 днів |
-| 🥦 База продуктів | 35+ вбудованих продуктів, можливість додавати власні |
-| ⚙️ Налаштування | Персональні денні норми (ккал / Б / Ж / В) |
-| 💾 Збереження | Всі дані зберігаються у `localStorage` браузера |
-
-## Запуск локально
+## Запуск
 
 ```bash
-# Клонуйте репозиторій
 git clone https://github.com/YOUR_USERNAME/calorie-tracker.git
 cd calorie-tracker
-
-# Запустіть будь-який статичний сервер, наприклад:
 npx serve .
-# або
-python3 -m http.server 8080
-
-# Відкрийте http://localhost:8080
 ```
 
-> **Важливо:** проєкт використовує ES Modules (`type="module"`), тому потрібен HTTP-сервер — відкриття `index.html` напряму через `file://` не працює.
+Відкрити `http://localhost:3000`.
 
----
+> Проєкт використовує ES Modules, тому потрібен HTTP-сервер. Відкриття `index.html` через `file://` не працює.
 
-## Структура файлів
+## Структура проєкту
 
 ```
 calorie-tracker/
 ├── index.html
-├── assets/
-│   └── css/
-│       └── style.css
+├── assets/css/style.css
 └── src/
-    ├── app.js                        # Composition Root (точка входу)
-    ├── data/
-    │   └── defaultFoods.js           # База продуктів за замовчуванням
-    ├── models/
-    │   ├── Food.js                   # Модель продукту
-    │   ├── DiaryEntry.js             # Модель запису щоденника
-    │   └── UserSettings.js           # Модель налаштувань
-    ├── repositories/
-    │   ├── BaseRepository.js         # Базовий клас (localStorage)
-    │   ├── FoodRepository.js
-    │   ├── DiaryRepository.js
-    │   └── SettingsRepository.js
-    ├── services/
-    │   ├── NutritionCalculator.js    # Стратегія обчислення
-    │   ├── DiaryService.js
-    │   ├── FoodService.js
-    │   └── SettingsService.js
-    ├── controllers/
-    │   ├── DiaryController.js
-    │   ├── FoodController.js
-    │   └── SettingsController.js
-    ├── views/
-    │   ├── DiaryView.js
-    │   ├── FoodDatabaseView.js
-    │   ├── SettingsView.js
-    │   └── Router.js
-    ├── patterns/
-    │   └── EventEmitter.js           # Observer pattern
-    └── utils/
-        ├── DateUtils.js
-        ├── DOM.js
-        └── Validator.js
+    ├── app.js                   # Точка входу, збірка залежностей
+    ├── data/defaultFoods.js     # База продуктів
+    ├── models/                  # Food, DiaryEntry, UserSettings
+    ├── repositories/            # Робота з localStorage
+    ├── services/                # Бізнес-логіка
+    ├── controllers/             # Зв'язок між сервісами і UI
+    ├── views/                   # Рендеринг і взаємодія з DOM
+    ├── patterns/                # EventEmitter
+    └── utils/                   # DOM, DateUtils, Validator, FormatUtils
 ```
 
 ---
 
 ## Programming Principles
 
-### 1. SRP — Single Responsibility Principle
-Кожен клас відповідає рівно за одну річ:
-- [`Food.js`](src/models/Food.js) — лише модель продукту і розрахунок нутрієнтів за вагою
-- [`FoodRepository.js`](src/repositories/FoodRepository.js) — лише CRUD у localStorage
-- [`FoodService.js`](src/services/FoodService.js) — лише бізнес-логіка над продуктами
-- [`FoodDatabaseView.js`](src/views/FoodDatabaseView.js) — лише рендеринг UI
+**SRP — Single Responsibility**
+Кожен клас відповідає за одну річ. `FoodRepository` — тільки CRUD у localStorage. `FoodService` — тільки бізнес-логіка над продуктами. `FoodDatabaseView` — тільки рендеринг UI.
 
-### 2. OCP — Open/Closed Principle
-[`NutritionCalculator`](src/services/NutritionCalculator.js) відкритий для розширення (нові стратегії розрахунку) і закритий для модифікації. Додати нову стратегію = написати новий клас, не чіпаючи існуючий код.
+**OCP — Open/Closed**
+`NutritionCalculator` приймає стратегію як параметр. Нову логіку обчислення можна додати окремим класом, не змінюючи існуючий код.
 
-### 3. DIP — Dependency Inversion Principle
-Всі залежності передаються через конструктор (dependency injection). [`app.js`](src/app.js) — єдине місце, де відбувається «зшивання» об'єктів (Composition Root). Жоден клас не створює залежності всередині себе через `new`.
+**DIP — Dependency Inversion**
+Всі залежності передаються через конструктор. `app.js` — єдине місце де створюються об'єкти. Жоден клас не створює залежності через `new` всередині себе.
 
-### 4. DRY — Don't Repeat Yourself
-- [`BaseRepository`](src/repositories/BaseRepository.js) містить спільну логіку localStorage для всіх репозиторіїв
-- [`DOM`](src/utils/DOM.js) та [`DateUtils`](src/utils/DateUtils.js) — утиліти без дублювання коду в представленнях
-- [`Validator`](src/utils/Validator.js) — централізована валідація форм
+**DRY — Don't Repeat Yourself**
+`BaseRepository` містить спільну логіку localStorage для всіх репозиторіїв. `Validator` централізує валідацію форм. `DOM` і `DateUtils` — загальні утиліти без дублювання в представленнях.
 
-### 5. KISS — Keep It Simple, Stupid
-- Жодних зовнішніх бібліотек (без React, Vue, jQuery)
-- Чисті ES Modules, мінімальна абстракція
-- Кожна функція робить одну річ
+**KISS**
+Без фреймворків і зайвих абстракцій. Чисті ES Modules, кожна функція робить одну річ.
 
-### 6. YAGNI — You Aren't Gonna Need It
-Реалізовано тільки потрібний функціонал — без «про запас» методів та конфігурацій.
+**YAGNI**
+Реалізовано тільки необхідний функціонал, без заготовок «про запас».
 
-### 7. Law of Demeter
-View-класи звертаються тільки до свого контролера, а не до репозиторіїв чи сервісів напряму. Ланцюги викликів обмежені одним рівнем.
+**Law of Demeter**
+View-класи звертаються тільки до свого контролера, не до репозиторіїв чи сервісів напряму.
 
 ---
 
 ## Design Patterns
 
-### 1. Observer [`src/patterns/EventEmitter.js`](src/patterns/EventEmitter.js)
-**Навіщо:** дозволяє View підписуватись на зміни даних без прямих посилань на інші компоненти. Коли [`DiaryService`](src/services/DiaryService.js) додає запис — він емітить `DIARY_UPDATED`, і всі підписники (наприклад, Router) можуть відреагувати незалежно.
+**Observer** — [`src/patterns/EventEmitter.js`](src/patterns/EventEmitter.js)
+
+Дозволяє компонентам реагувати на зміни даних без прямих посилань один на одного. Коли `DiaryService` додає запис, він емітить подію `DIARY_UPDATED` — всі підписники реагують незалежно.
 
 ```js
 appEvents.emit(EVENTS.DIARY_UPDATED, { date });
 appEvents.on(EVENTS.DIARY_UPDATED, ({ date }) => diaryView.render());
 ```
 
-### 2. Repository [`src/repositories/`](src/repositories/)
-**Навіщо:** приховує деталі збереження даних (localStorage) за єдиним інтерфейсом. Замінити localStorage на IndexedDB або REST API — достатньо змінити лише репозиторій, не торкаючись сервісів і контролерів.
+**Repository** — [`src/repositories/`](src/repositories/)
+
+Приховує деталі збереження за єдиним інтерфейсом. Замінити localStorage на IndexedDB або REST API можна змінивши лише репозиторій, не торкаючись сервісів і контролерів.
+
+**Strategy** — [`src/services/NutritionCalculator.js`](src/services/NutritionCalculator.js)
+
+Дозволяє підмінювати алгоритм обчислення нутрієнтів. Для денного підсумку використовується `SumStrategy`, для тижневої статистики — `AverageStrategy`.
 
 ```js
-// BaseRepository.js
-_load() { return JSON.parse(localStorage.getItem(this._storageKey)); }
-_save(data) { localStorage.setItem(this._storageKey, JSON.stringify(data)); }
-```
-
-### 3. Strategy [`src/services/NutritionCalculator.js`](src/services/NutritionCalculator.js)
-**Навіщо:** дозволяє підміняти алгоритм обчислення нутрієнтів (сума vs середнє) без зміни коду споживача. Наприклад, для тижневого звіту використовується `AverageStrategy`, для денного — `SumStrategy`.
-
-```js
-const calculator = new NutritionCalculator(new AverageStrategy());
-calculator.calculate(entries); // використовує AverageStrategy
-calculator.setStrategy(new SumStrategy());
-calculator.calculate(entries); // тепер SumStrategy
+const calc = new NutritionCalculator(new AverageStrategy());
+calc.setStrategy(new SumStrategy());
 ```
 
 ---
 
 ## Refactoring Techniques
 
-### 1. Extract Method
-Великі функції розбиті на дрібні: `render()` у [`DiaryView`](src/views/DiaryView.js) делегує роботу `_renderMacroCards()`, `_renderWeeklyChart()`, `_renderMeals()`.
+**Extract Method** — великі функції розбиті на дрібні. `DiaryView.render()` делегує роботу `_renderMacroCards()`, `_renderWeeklyChart()`, `_renderMeals()`.
 
-### 2. Extract Class
-Логіка обчислень винесена з сервісу в окремий [`NutritionCalculator`](src/services/NutritionCalculator.js). Логіка роботи з DOM — у [`DOM`](src/utils/DOM.js). Валідація — у [`Validator`](src/utils/Validator.js).
+**Extract Class** — логіка обчислень винесена в `NutritionCalculator`, робота з DOM — в `DOM`, валідація — в `Validator`, форматування — в `FormatUtils`.
 
-### 3. Replace Magic Number with Named Constant
-Замість `localStorage.setItem('ct_foods', ...)` — константа `const STORAGE_KEY = 'ct_foods'` у кожному репозиторії. Замість числових порогів — іменовані поля в `UserSettings`.
+**Replace Magic Number with Named Constant** — замість рядкових літералів у `localStorage.setItem(...)` використовуються константи `STORAGE_KEY` у кожному репозиторії.
 
-### 4. Introduce Parameter Object
-Замість `addEntry(foodId, grams, date, mealType)` — метод приймає об'єкт `{ foodId, grams, date, mealType }`, що спрощує розширення без зміни сигнатури.
+**Introduce Parameter Object** — замість `addEntry(foodId, grams, date, mealType)` метод приймає один об'єкт `{ foodId, grams, date, mealType }`.
 
-### 5. Replace Conditional with Polymorphism
-Замість `if (strategy === 'sum') { ... } else if (strategy === 'avg') { ... }` — класи `SumStrategy` і `AverageStrategy` з однаковим інтерфейсом `calculate(entries)`.
+**Replace Conditional with Polymorphism** — замість `if/else` на тип стратегії — класи `SumStrategy` і `AverageStrategy` з однаковим інтерфейсом `calculate(entries)`.
 
-### 6. Encapsulate Field
-Усі поля репозиторіїв — приватні (`_storageKey`, `_listeners`). Доступ — лише через публічні методи.
+**Encapsulate Field** — поля репозиторіїв і сервісів приватні (`_storageKey`, `_listeners`), доступ тільки через публічні методи.
 
-### 7. Separate Query from Modifier
-Методи в сервісах або повертають дані (`getEntriesForDate`) або змінюють стан (`addEntry`), але не обидва одночасно — принцип CQS (Command Query Separation).
+**Command Query Separation** — методи або повертають дані (`getEntriesForDate`), або змінюють стан (`addEntry`), але не обидва одночасно.
