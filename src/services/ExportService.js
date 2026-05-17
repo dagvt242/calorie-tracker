@@ -1,3 +1,4 @@
+import { MEAL_LABELS_PLAIN } from '../constants/mealLabels.js';
 /**
  * ExportService provides functionality for exporting diary data.
  * Implements CSV export strategy for user data portability.
@@ -12,11 +13,10 @@ export class ExportService {
   exportToCsv(startDate, endDate) {
     const entries = this._diary.getDateRange(startDate, endDate);
     const header = ['Дата', 'Прийом їжі', 'Продукт', 'Вага (г)', 'Калорії', 'Білки (г)', 'Жири (г)', 'Вуглеводи (г)'];
-    const MEAL_LABELS = { breakfast: 'Сніданок', lunch: 'Обід', dinner: 'Вечеря', snack: 'Перекус' };
 
     const rows = entries.map((e) => [
       e.date,
-      MEAL_LABELS[e.mealType] ?? e.mealType,
+      MEAL_LABELS_PLAIN[e.mealType] ?? e.mealType,
       `"${e.foodName}"`,
       e.grams,
       e.calories,
