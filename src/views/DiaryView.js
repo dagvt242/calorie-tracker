@@ -1,12 +1,6 @@
 import { DOM } from '../utils/DOM.js';
 import { DateUtils } from '../utils/DateUtils.js';
-
-const MEAL_LABELS = {
-  breakfast: '🌅 Сніданок',
-  lunch: '☀️ Обід',
-  dinner: '🌙 Вечеря',
-  snack: '🍎 Перекус',
-};
+import { MEAL_LABELS } from '../constants/mealLabels.js';
 
 export class DiaryView {
   constructor(diaryController, foodController) {
